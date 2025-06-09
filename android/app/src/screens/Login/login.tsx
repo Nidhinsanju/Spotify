@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8.5,
     backgroundColor: '#1ED760',
   },
-  googleButton: {x
+  googleButton: {
     margin: 4,
     width: '90%',
     justifyContent: 'center',
