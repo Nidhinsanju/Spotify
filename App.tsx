@@ -1,7 +1,7 @@
 import React from 'react';
-import Login from './android/app/src/screens/Login/login';
-import {ScrollView, StatusBar, useColorScheme, View} from 'react-native';
+import {useColorScheme, View, StatusBar} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {AppNavigator} from './android/app/src/navigation/AppNavigator';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -17,7 +17,7 @@ function App(): React.JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <Login />
+      <AppNavigator />
     </View>
   );
 }
