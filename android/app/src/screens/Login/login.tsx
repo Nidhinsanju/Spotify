@@ -6,36 +6,41 @@ import {
   TouchableOpacity,
   ImageBackground,
   Image,
+  ViewStyle,
 } from 'react-native';
 import musicBackground from '../../assets/public/musicBackground.jpg';
 import spotifylogo from '../../assets/public/spotifyLogo.png';
+import {useNavigation} from '@react-navigation/native';
+import {LoginScreenNavigationProp} from '../../types/navigation';
+import {RootStackParamList} from '../../types/navigation';
+
+type ScreenName = keyof RootStackParamList; // 'Login' | 'Signup' | 'Signin' | 'Auth'
 
 function Login() {
-  const button = [
+  const navigation = useNavigation<LoginScreenNavigationProp>(); // typed navigation
+  const button: {
+    id: number;
+    title: string;
+    style: ViewStyle;
+    nav: ScreenName;
+  }[] = [
     {
       id: 1,
       title: 'Sign Up free',
       style: styles.signUpButton,
+      nav: 'Signup',
     },
-    {
-      id: 2,
-      title: 'Continue With Google',
-      style: styles.googleButton,
-    },
+    // {
+    //   id: 2,
+    //   title: 'Continue With Google',
+    //   style: styles.googleButton,
+    //   nav: 'Auth',
+    // },
     {
       id: 3,
-      title: 'Continue with Facebook',
-      style: styles.faceBookButton,
-    },
-    {
-      id: 4,
-      title: 'Continue with Apple',
-      style: styles.appleButton,
-    },
-    {
-      id: 5,
       title: 'Log in',
       style: styles.LoginButton,
+      nav: 'Signin',
     },
   ];
 
@@ -58,7 +63,7 @@ function Login() {
                 key={index}
                 style={item.style}
                 onPress={() => {
-                  console.log(item.id, 'clicked');
+                  navigation.navigate(item.nav);
                 }}>
                 <Text style={styles.buttonText}>{item.title}</Text>
               </TouchableOpacity>
