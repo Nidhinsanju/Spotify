@@ -18,10 +18,12 @@ export const AppNavigator = () => {
   useEffect(() => {
     const checkAuth = async () => {
       // Example: fetch token from storage
-      const token = 'asdada'; // replace with AsyncStorage.getItem("token")
+      const token = true; // replace with AsyncStorage.getItem("token")
       setIsAuthenticated(!!token);
+      return !!token;
     };
     checkAuth();
+
   }, []);
 
   const withLayout = <P extends object>(Component: ComponentType<P>) => {
@@ -34,42 +36,36 @@ export const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        {isAuthenticated ? (
-          // Protected App Stack
-          <>
-            <Stack.Screen
-              name="SpotifyHome"
-              component={withLayout(Home)}
-              options={{headerShown: false}}
-            />
-            {/* Add more protected screens here */}
-          </>
-        ) : (
-          // Auth Stack
-          <>
-            <Stack.Screen
-              name="Home"
-              component={Login}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name="Signin"
-              component={Signin}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name="Signup"
-              component={Signup}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name="PasswordRest"
-              component={ResetPassword}
-              options={{headerShown: false}}
-            />
-          </>
-        )}
+      <Stack.Navigator
+        initialRouteName={'Home'}
+        screenOptions={{headerShown: false}}>
+        <>
+          <Stack.Screen
+            name="SpotifyHome"
+            component={withLayout(Home)}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Home"
+            component={Login}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Signin"
+            component={Signin}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Signup"
+            component={Signup}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="PasswordRest"
+            component={ResetPassword}
+            options={{headerShown: false}}
+          />
+        </>
       </Stack.Navigator>
     </NavigationContainer>
   );

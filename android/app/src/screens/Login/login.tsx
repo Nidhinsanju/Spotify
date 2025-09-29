@@ -11,13 +11,11 @@ import {
 import musicBackground from '../../assets/public/musicBackground.jpg';
 import spotifylogo from '../../assets/public/spotifyLogo.png';
 import {useNavigation} from '@react-navigation/native';
-import {LoginScreenNavigationProp} from '../../types/navigation';
 import {RootStackParamList} from '../../types/navigation';
 
 type ScreenName = keyof RootStackParamList; // 'Login' | 'Signup' | 'Signin' | 'Auth'
 
-function Login() {
-  const navigation = useNavigation<LoginScreenNavigationProp>(); // typed navigation
+function Login({navigation}: any) {
   const button: {
     id: number;
     title: string;
