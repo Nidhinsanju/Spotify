@@ -1,7 +1,4 @@
 import React, {useState} from 'react';
-import bgImage from '../../../src/assets/public/musicBackground.jpg'; // Place your background image in assets folder
-import spotifyLogo from '../../assets/public/spotifyLogo.png'; // Place Spotify logo in assets folder
-
 import {
   View,
   Text,
@@ -13,20 +10,62 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {SignupScreenNavigationProp} from '../../types/navigation';
 
-// Import your background image (adjust the path as needed)
+import bgImage from '../../../src/assets/public/musicBackground.jpg';
+import spotifyLogo from '../../assets/public/spotifyLogo.png';
+import Login_CALL from '../../Hooks/API/Login';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Signin: React.FC = () => {
+const Signin: React.FC = ({navigation}: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<{email?: string; password?: string}>({});
 
-  const navigation = useNavigation<SignupScreenNavigationProp>();
+  const validateValues = () => {
+    let valid = true;
+    let errors: {email?: string; password?: string} = {};
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
-  const handleLogin = () => {
-    navigation.navigate('SpotifyHome');
-    // Handle login logic here
+    // Email validation
+    if (!email) {
+      errors.email = 'Email is required';
+      valid = false;
+    } else {
+      // ✅ Email regex validation
+      if (email && !emailRegex?.test(email)) {
+        errors.email = 'Enter a valid email or username';
+        valid = false;
+      } else {
+        valid = true;
+      }
+    }
+
+    // Password validation
+    if (!password) {
+      errors.password = 'Password is required';
+      valid = false;
+    } else if (password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+      valid = false;
+    }
+
+    setError(errors);
+    return valid;
+  };
+
+  const handleLogin = async () => {
+    if (!validateValues()) return;
+    const payload = {
+      email: email,
+      password: password,
+    };
+    const {success, data, status} = await Login_CALL(payload);
+    if (status === 200) {
+      await AsyncStorage.setItem('token', data?.token:any);
+      navigation.navigate('SpotifyHome');
+    } else {
+      console.log('Something went wrong');
+    }
   };
 
   return (
@@ -40,17 +79,23 @@ const Signin: React.FC = () => {
         <View style={styles.logoContainer}>
           <Image source={spotifyLogo} style={styles.logo} />
         </View>
+
         <View style={styles.form}>
           <Text style={styles.title}>Sign in to Spotify</Text>
+
           <TextInput
             style={styles.input}
             placeholder="Email or username"
             placeholderTextColor="#b3b3b3"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={text => {
+              setEmail(text);
+            }}
             autoCapitalize="none"
             keyboardType="email-address"
           />
+          {error.email && <Text style={styles.errorText}>{error.email}</Text>}
+
           <TextInput
             style={styles.input}
             placeholder="Password"
@@ -59,25 +104,22 @@ const Signin: React.FC = () => {
             onChangeText={setPassword}
             secureTextEntry
           />
+          {error.password && (
+            <Text style={styles.errorText}>{error.password}</Text>
+          )}
+
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>LOG IN</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
-            <Text
-              style={styles.forgot}
-              onPress={() => {
-                navigation.navigate('PasswordRest');
-              }}>
-              Forgot your password?
-            </Text>
+
+          <TouchableOpacity onPress={() => navigation.navigate('PasswordRest')}>
+            <Text style={styles.forgot}>Forgot your password?</Text>
           </TouchableOpacity>
         </View>
+
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account?</Text>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('Signup');
-            }}>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
             <Text style={styles.signup}>Sign up for Spotify</Text>
           </TouchableOpacity>
         </View>
@@ -128,8 +170,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    marginBottom: 16,
+    marginBottom: 8,
     fontSize: 16,
+  },
+  errorText: {
+    color: '#ff4d4d',
+    marginBottom: 8,
+    textAlign: 'center',
+    fontSize: 13,
   },
   button: {
     backgroundColor: '#1DB954',

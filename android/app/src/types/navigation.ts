@@ -12,10 +12,6 @@ export type RootStackParamList = {
 };
 
 // 2️⃣ Create a navigation prop type for Login screen
-export type LoginScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Login'
->;
 
 export type SigninScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,

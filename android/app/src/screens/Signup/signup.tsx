@@ -10,15 +10,12 @@ import {
   StatusBar,
   ScrollView,
 } from 'react-native';
-import {SigninScreenNavigationProp} from '../../types/navigation';
 
-const SignupScreen: React.FC = () => {
+const SignupScreen: React.FC = ({navigation}: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
-
-  const navigation = useNavigation<SigninScreenNavigationProp>();
 
   const handleSignup = () => {
     if (!email || !password || !username) {
