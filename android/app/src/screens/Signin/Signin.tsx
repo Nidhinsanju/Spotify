@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   View,
   Text,
@@ -15,11 +15,15 @@ import bgImage from '../../../src/assets/public/musicBackground.jpg';
 import spotifyLogo from '../../assets/public/spotifyLogo.png';
 import Login_CALL from '../../Hooks/API/Login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Notification} from '../../components/Layout/Notification';
+import {AuthContext} from '../../navigation/AppContext';
+import PushNotification from 'react-native-push-notification';
 
 const Signin: React.FC = ({navigation}: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<{email?: string; password?: string}>({});
+  const auth = useContext(AuthContext);
 
   const validateValues = () => {
     let valid = true;
@@ -59,12 +63,25 @@ const Signin: React.FC = ({navigation}: any) => {
       email: email,
       password: password,
     };
-    const {success, data, status} = await Login_CALL(payload);
-    if (status === 200) {
-      await AsyncStorage.setItem('token', data?.token:any);
-      navigation.navigate('SpotifyHome');
+    const {success, data, message} = await Login_CALL(payload);
+    if (success && data?.token) {
+      PushNotification.localNotification({
+        channelId: 'default-channel-id',
+        title: 'Login Successful',
+        message: 'Welcome back!',
+        playSound: true,
+        soundName: 'default',
+        importance: 4,
+        priority: 'high', // 👈 add this
+        vibrate: true,
+      });
+      auth.login(data?.token); // navigation.reset({
+      //   index: 0,
+      //   routes: [{name: 'SpotifyHome'}],
+      // });
+      // Notification('default-channel-id', 'Sucess', 'Logged In Successfully');
     } else {
-      console.log('Something went wrong');
+      console.log('Something went wrong', message);
     }
   };
 

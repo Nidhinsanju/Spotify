@@ -14,6 +14,7 @@ interface ApiResponse {
   data?: LoginResponse;
   error?: string;
   status?: number;
+  message: string;
 }
 
 import axios from 'axios';
@@ -25,25 +26,47 @@ export default async function Login_CALL(
   const {email, password} = data;
 
   try {
-    const res = await axios.post<LoginResponse>(LOGIN_API, {
-      userName: email,
-      password,
-    });
+    const res = await axios.post<LoginResponse>(
+      LOGIN_API,
+      {
+        userName: email,
+        password,
+      },
+      {
+        validateStatus: () => true, //Prevents Axios from throwing for non-2xx
+      },
+    );
 
-
-    return {
-      success: true,
-      data: res.data,
-      status: res.status,
-    };
-  } catch (err: any) {
-    console.error(err, 'this is err');
-
+    // ✅ Now Axios won’t throw — you can handle based on status
+    if (res.status === 200) {
+      return {
+        success: true,
+        message: 'Login successful!',
+        data: res.data,
+      };
+    } else if (res.status === 400) {
+      return {
+        success: false,
+        message: 'Invalid credentials. Please try again.',
+      };
+    } else if (res.status === 404) {
+      return {
+        success: false,
+        message: 'Server not found. Please check your API URL.',
+      };
+    } else if (res.status === 500) {
+      return {
+        success: false,
+        message: 'Internal server error. Please try later.',
+      };
+    } else {
+      return {success: false, message: `Unexpected error (${res.status})`};
+    }
+  } catch (err) {
+    console.log('Unexpected error:', err);
     return {
       success: false,
-      error:
-        err.response?.data?.message || err.message || 'Something went wrong',
-      status: err.response?.status,
+      message: 'Network error. Please check your connection.',
     };
   }
 }
