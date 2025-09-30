@@ -1,8 +1,10 @@
 import React, {useEffect} from 'react';
 import {useColorScheme, View, StatusBar, Platform} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {AppNavigator} from './android/app/src/navigation/AppNavigator';
 import PushNotification from 'react-native-push-notification';
+import {NavigationContainer} from '@react-navigation/native';
+import {AppNavigator} from './android/app/src/navigation/AppNavigator';
+import {AuthProvider} from './android/app/src/navigation/AppContext';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -13,7 +15,7 @@ function App(): React.JSX.Element {
   };
 
   useEffect(() => {
-    // Create channel for Android
+    console.log(Platform.OS, 'this is os');
     if (Platform.OS === 'android') {
       PushNotification.createChannel(
         {
@@ -22,25 +24,36 @@ function App(): React.JSX.Element {
           importance: 4,
           vibrate: true,
         },
-        created => console.log(`createChannel returned '${created}'`),
+        created => {
+          console.log(`createChannel returned '${created}'`);
+
+          // ✅ send local notification after channel is ready
+          PushNotification.localNotification({
+            channelId: 'default-channel-id',
+            title: 'Hello',
+            message: 'This is a local notification',
+            playSound: true,
+            soundName: 'default',
+            importance: 4,
+            vibrate: true,
+          });
+        },
       );
+    } else {
+      // iOS: just send notification
+      PushNotification.localNotification({
+        title: 'Hello',
+        message: 'This is a local notification',
+      });
     }
 
-    // Configure push notifications
     PushNotification.configure({
       onNotification: function (notification) {
         console.log('NOTIFICATION:', notification);
       },
       requestPermissions: Platform.OS === 'ios',
     });
-
-    // Send a local notification
-    PushNotification.localNotification({
-      channelId: 'default-channel-id',
-      title: 'Hello',
-      message: 'This is a local notification',
-    });
-  }, []); // empty dependency array = run once on mount
+  }, []);
 
   return (
     <View style={backgroundStyle}>
@@ -48,7 +61,11 @@ function App(): React.JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <AppNavigator />
+      <AuthProvider>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </AuthProvider>
     </View>
   );
 }

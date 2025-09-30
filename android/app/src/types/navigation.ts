@@ -9,6 +9,8 @@ export type RootStackParamList = {
   Auth: undefined;
   PasswordRest: undefined;
   SpotifyHome: undefined;
+  Home: undefined;
+  InitalPage: undefined;
 };
 
 // 2️⃣ Create a navigation prop type for Login screen

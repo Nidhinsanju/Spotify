@@ -1,4 +1,7 @@
-import React, {useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
+
+import React, {useContext, useState} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -9,6 +12,8 @@ import {
   Text,
   Image,
 } from 'react-native';
+import {SigninScreenNavigationProp} from '../../types/navigation';
+import {AuthContext} from '../../navigation/AppContext';
 
 const {width} = Dimensions.get('window');
 const MENU_WIDTH = width * 0.7;
@@ -21,8 +26,18 @@ const profileImage =
   'https://www.cielhr.com/wp-content/uploads/2020/10/dummy-image.jpg'; // Placeholder
 
 const Layout: React.FC<LayoutProps> = ({children}) => {
+  const navigation = useNavigation<SigninScreenNavigationProp>();
   const [menuOpen, setMenuOpen] = useState(false);
   const slideAnim = React.useRef(new Animated.Value(-MENU_WIDTH)).current;
+  const auth = useContext(AuthContext);
+
+  const handleLogOut = async () => {
+    try {
+      auth.logout(); // ✅ this will remove token and update isAuthenticated
+    } catch (e) {
+      console.error('Failed to clear storage:', e);
+    }
+  };
 
   const openMenu = () => {
     setMenuOpen(true);
@@ -68,7 +83,13 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
               <Text style={styles.menuItem}>Home</Text>
               <Text style={styles.menuItem}>Your Library</Text>
               <Text style={styles.menuItem}>Settings</Text>
-              <Text style={styles.menuItem}>Log out</Text>
+              <Text
+                style={styles.menuItem}
+                onPress={() => {
+                  handleLogOut();
+                }}>
+                Log out
+              </Text>
             </View>
           </Animated.View>
         </TouchableOpacity>

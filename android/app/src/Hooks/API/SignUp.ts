@@ -1,36 +1,38 @@
 interface LoginCredentials {
   email: string;
   password: string;
+  userName: string;
 }
 
-interface LoginResponse {
+interface SignupResponse {
   userName: string;
   ID: number;
-  token: string;
+  password: string;
 }
 
 interface ApiResponse {
   success: boolean;
-  data?: LoginResponse;
+  data?: SignupResponse;
   error?: string;
   status?: number;
   message: string;
 }
 
 import axios from 'axios';
-import {LOGIN_API} from '../URLS';
+import {SIGNUP_API} from '../URLS';
 
-export default async function Login_CALL(
+export default async function Signup_CALL(
   data: LoginCredentials,
 ): Promise<ApiResponse> {
-  const {email, password} = data;
+  const {email, password, userName} = data;
 
   try {
-    const res = await axios.post<LoginResponse>(
-      LOGIN_API,
+    const res = await axios.post<SignupResponse>(
+      SIGNUP_API,
       {
-        userName: email,
+        email,
         password,
+        userName,
       },
       {
         validateStatus: () => true, //Prevents Axios from throwing for non-2xx
@@ -38,7 +40,7 @@ export default async function Login_CALL(
     );
 
     // ✅ Now Axios won’t throw — you can handle based on status
-    if (res.status === 200) {
+    if (res.status === 201) {
       return {
         success: true,
         message: 'Login successful!',
