@@ -9,7 +9,9 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
+  Alert,
 } from 'react-native';
+import Signup_CALL from '../../Hooks/API/SignUp';
 
 const SignupScreen: React.FC = ({navigation}: any) => {
   const [email, setEmail] = useState('');
@@ -17,13 +19,25 @@ const SignupScreen: React.FC = ({navigation}: any) => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!email || !password || !username) {
       setError('Please fill all fields');
       return;
     }
     // Handle signup logic here
     setError('');
+    const payload = {
+      email: email,
+      password: password,
+      userName: username,
+    };
+    const {success, message} = await Signup_CALL(payload);
+    console.log(success, message, 'this is response');
+    if (success) {
+      navigation.navigate('Signin');
+      Alert.alert(message);
+    }
+
     // e.g., call API
   };
 

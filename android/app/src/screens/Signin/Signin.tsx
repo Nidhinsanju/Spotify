@@ -9,13 +9,12 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 
 import bgImage from '../../../src/assets/public/musicBackground.jpg';
 import spotifyLogo from '../../assets/public/spotifyLogo.png';
 import Login_CALL from '../../Hooks/API/Login';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Notification} from '../../components/Layout/Notification';
 import {AuthContext} from '../../navigation/AppContext';
 import PushNotification from 'react-native-push-notification';
 
@@ -72,9 +71,10 @@ const Signin: React.FC = ({navigation}: any) => {
         playSound: true,
         soundName: 'default',
         importance: 4,
-        priority: 'high', // 👈 add this
+        priority: 'high',
         vibrate: true,
       });
+      Alert.alert('Logged in Successfully');
       auth.login(data?.token); // navigation.reset({
       //   index: 0,
       //   routes: [{name: 'SpotifyHome'}],
