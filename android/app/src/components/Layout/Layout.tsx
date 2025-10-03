@@ -1,7 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation, NavigationProp} from '@react-navigation/native';
-
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useRef, useEffect} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -12,9 +9,10 @@ import {
   Text,
   Image,
 } from 'react-native';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
 import {SigninScreenNavigationProp} from '../../types/navigation';
 import {AuthContext} from '../../navigation/AppContext';
-
+import Player from '../Player';
 const {width} = Dimensions.get('window');
 const MENU_WIDTH = width * 0.7;
 
@@ -28,12 +26,12 @@ const profileImage =
 const Layout: React.FC<LayoutProps> = ({children}) => {
   const navigation = useNavigation<SigninScreenNavigationProp>();
   const [menuOpen, setMenuOpen] = useState(false);
-  const slideAnim = React.useRef(new Animated.Value(-MENU_WIDTH)).current;
+  const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
   const auth = useContext(AuthContext);
 
   const handleLogOut = async () => {
     try {
-      auth.logout(); // ✅ this will remove token and update isAuthenticated
+      auth.logout(); // removes token and updates isAuthenticated
     } catch (e) {
       console.error('Failed to clear storage:', e);
     }
@@ -81,8 +79,6 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
             </View>
             <View style={styles.menuItems}>
               <Text style={styles.menuItem}>Home</Text>
-              <Text style={styles.menuItem}>Your Library</Text>
-              <Text style={styles.menuItem}>Settings</Text>
               <Text
                 style={styles.menuItem}
                 onPress={() => {
@@ -97,6 +93,22 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
 
       {/* Main Content */}
       <View style={styles.content}>{children}</View>
+
+      {/* Player Footer */}
+      <View style={styles.footerPlayer}>
+        <Player
+          songs={[
+            {
+              title: 'Sample Song',
+              artist: 'Artist Name',
+              albumArt: 'https://picsum.photos/200',
+              audioSrc:
+                'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+            },
+          ]}
+          onPlayPause={playing => console.log('Playing?', playing)}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -178,6 +190,14 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingBottom: 80, // <-- leave space for footer Player
+  },
+  footerPlayer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 20, // above menu overlay
   },
 });
 
